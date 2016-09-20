@@ -25,7 +25,7 @@ void fft(int log2point, double complex *xy_out, const double complex *xy_in) {
 	brev = (brev >> 16) | (brev << 16);
 
 	brev >>= 32-log2point;
-	xy_out[i] = xy_in[brev];
+	xy_out[brev] = xy_in[i];
     }
 
     // here begins the Danielson-Lanczos section
