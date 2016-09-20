@@ -2,10 +2,11 @@
 #include <malloc.h>
 #include "all_header.h"
 
-// Internal variable and function
+// Internal variables
 static int phasevec_exist = 0;
 static double complex phasevec[32];
 
+// Public function
 void fft(int log2point, double complex *xy_out, const double complex *xy_in) {
     int i;
     if (!phasevec_exist) {

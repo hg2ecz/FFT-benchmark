@@ -22,10 +22,15 @@ static double timeend() {
     return nsec/1000./1000.;
 }
 
+void printres(int i, double complex *d, char *txt) {
+    printf("%3d %16.9f %16.9f %16.9f (%s)\n", i, creal(d[i]), cimag(d[i]), cabs(d[i]), txt);
+}
+
 #define SIZE (1<<LOG2FFTSIZE)
 
 double complex xy[SIZE];
 double complex xy_out_dft[SIZE];
+double complex xy_out_dft_oddeven[SIZE];
 double complex xy_out_fft[SIZE];
 double complex xy_out_fftw[SIZE];
 
@@ -46,26 +51,40 @@ int main() {
     timestart();
     for (i=0; i<DFT_REPEAT; i++) dft(LOG2FFTSIZE, xy_out_dft, xy); // dft_init(LOG2FFTSIZE) után 19,75 ms 1024 pt darabja
     eltime = timeend();
-    printf("%6d piece of %d pt DFT; %.5f ms/piece\n", DFT_REPEAT, 1<<LOG2FFTSIZE, eltime/DFT_REPEAT);
+    printf("--> CPU wake up; (%2d piece of %d pt DFT;  %9.5f ms/piece)\n\n", DFT_REPEAT, 1<<LOG2FFTSIZE, eltime/DFT_REPEAT);
+
+// DFT
+    timestart();
+    for (i=0; i<DFT_REPEAT; i++) dft(LOG2FFTSIZE, xy_out_dft, xy); // dft_init(LOG2FFTSIZE) után 19,75 ms 1024 pt darabja
+    eltime = timeend();
+    printf("%6d piece of %d pt DFT;  %9.5f ms/piece\n", DFT_REPEAT, 1<<LOG2FFTSIZE, eltime/DFT_REPEAT);
+
+// DFT odd even
+    timestart();
+    for (i=0; i<DFT_REPEAT; i++) dft_odd_even(LOG2FFTSIZE, xy_out_dft_oddeven, xy); // dft_init(LOG2FFTSIZE) után 19,75 ms 1024 pt darabja
+    eltime = timeend();
+    printf("%6d piece of %d pt DFT;  %9.5f ms/piece (odd-even version)\n", DFT_REPEAT, 1<<LOG2FFTSIZE, eltime/DFT_REPEAT);
 
 // FFT
     timestart();
     for (i=0; i<FFT_REPEAT; i++) fft(LOG2FFTSIZE, xy_out_fft, xy);
     eltime = timeend();
-    printf("%6d piece of %d pt FFT; %.5f ms/piece\n", FFT_REPEAT, 1<<LOG2FFTSIZE, eltime/FFT_REPEAT);
+    printf("%6d piece of %d pt FFT;  %9.5f ms/piece\n", FFT_REPEAT, 1<<LOG2FFTSIZE, eltime/FFT_REPEAT);
     eltime_fft = eltime;
 
 // libfftw3
     timestart();
     fftw(LOG2FFTSIZE, xy_out_fftw, xy, FFT_REPEAT); // repeated inside FFT_func
     eltime = timeend();
-    printf("%6d piece of %d pt FFT; %.5f ms/piece (libfftw3) - libFFT3 is %.3fx faster than optimized FFT\n\n", FFT_REPEAT, 1<<LOG2FFTSIZE, eltime/FFT_REPEAT, eltime_fft/eltime);
+    printf("%6d piece of %d pt FFTW; %9.5f ms/piece (libfftw3) - libFFT3 is %.3fx faster than optimized FFT\n\n", FFT_REPEAT, 1<<LOG2FFTSIZE, eltime/FFT_REPEAT, eltime_fft/eltime);
 
 
     for(i=0; i<6; i++) {
-	printf("%3d %16.9f %16.9f %16.9f (dft)\n", i, creal(xy_out_dft[i]), cimag(xy_out_dft[i]), cabs(xy_out_dft[i]));
-	printf("%3d %16.9f %16.9f %16.9f (fft)\n", i, creal(xy_out_fft[i]), cimag(xy_out_fft[i]), cabs(xy_out_fft[i]));
-	printf("%3d %16.9f %16.9f %16.9f (fftw)\n", i, creal(xy_out_fftw[i]), cimag(xy_out_fftw[i]), cabs(xy_out_fftw[i]));
+	printres(i, xy_out_dft, "dft");
+	printres(i, xy_out_dft_oddeven, "dft - odd even");
+	printres(i, xy_out_fft, "fft");
+	printres(i, xy_out_fftw, "fftw");
+
 	printf("\n");
     }
     return 0;

@@ -2,6 +2,7 @@
 #include <fftw3.h>
 #include "all_header.h"
 
+// Public function
 void fftw(int log2point, double complex *xy_out, /*const*/ double complex *xy_in, int fft_repeat) {
     int i;
     int point = 1<<log2point;

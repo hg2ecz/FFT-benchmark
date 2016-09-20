@@ -1,7 +1,7 @@
 #include <math.h>
 #include "all_header.h"
 
-// Internal variable and function
+// Internal variables
 static int phasevec_exist = 0;
 static double complex phasevec[33];
 

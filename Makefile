@@ -10,7 +10,7 @@ CFLAGS+=-DDFT_REPEAT=1
 CFLAGS+=-DFFT_REPEAT=1000
 
 LDFLAGS=-lm -lfftw3 -s
-OBJS=dft.o fft.o fftw.o benchmark-fft.o
+OBJS=dft.o dft_odd_even.o fft.o fftw.o benchmark-fft.o
 
 TARGET=benchmark-fft
 
